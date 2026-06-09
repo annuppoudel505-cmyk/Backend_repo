@@ -1,0 +1,29 @@
+name: Maven CI
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.CI_TOKEN }}
+       
+      - name: Build docker image and push to GHCR
+        uses: docker/build-push-action@v4
+        with:
+          context: dockerfile.multi
+          push: false
+          tags: ghcr.io/${{ github.repository }}:latest .
+
