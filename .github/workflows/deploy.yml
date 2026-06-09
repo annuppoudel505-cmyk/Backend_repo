@@ -25,5 +25,5 @@ jobs:
         with:
           context: dockerfile.multi
           push: false
-          tags: ghcr.io/${{ github.repository }}:latest .
+          tags: latest
 
