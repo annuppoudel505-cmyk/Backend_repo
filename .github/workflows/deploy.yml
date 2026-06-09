@@ -32,6 +32,6 @@ jobs:
           context: .
           file: ./dockerfile.multi
           push: true
-          tags: latest
+          tags: ghcr.io/annuppoudel505-cmyk/backend_repo:latest
 
 
