@@ -8,7 +8,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    permissions:
+        contents: read
+        packages: write
+        
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
@@ -19,6 +22,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.CI_TOKEN }}
+
        
       - name: Build docker image and push to GHCR
         uses: docker/build-push-action@v4
