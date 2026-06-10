@@ -3,5 +3,8 @@ services:
     image: ghcr.io/annuppoudel505-cmyk/backend_repo:latest
     container_name: backend 
     restart: always 
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
     ports:
-      - "8080:8080"
+      - "80:8080"

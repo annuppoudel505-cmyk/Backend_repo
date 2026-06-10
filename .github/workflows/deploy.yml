@@ -38,6 +38,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Copy docker-compose.yml to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: "docker-compose.yml"
+          target: "/opt/be39"
+
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.0
         with: 
@@ -49,15 +61,21 @@ jobs:
 
             echo "${{ secrets.CI_TOKEN }}" | docker login ghcr.io -u $GHCR_USERNAME --password-stdin
             
-            echo "Pulling latest image..."
-            docker pull ghcr.io/annuppoudel505-cmyk/backend_repo:latest
-            
-            echo "Stopping old container..."
-            docker stop backend || true
-            docker rm backend || true
+            cd /opt/be39
+            docker-compose pull 
+            docker-compose down -v --remove-orphans || true
+            docker-compose up -d 
+            docker image prune -f
+            docker ps
+          ## echo "Pulling latest image..."
+          ##docker pull ghcr.io/annuppoudel505-cmyk/backend_repo:latest
+          
+          ##echo "Stopping old container..."
+          ##docker stop backend || true
+          ##docker rm backend || true
 
-            echo "Starting new container..."
-            docker run -d --name backend -p 80:8080 ghcr.io/annuppoudel505-cmyk/backend_repo:latest
+          ##echo "Starting new container..."
+          ##docker run -d --name backend -p 80:8080 ghcr.io/annuppoudel505-cmyk/backend_repo:latest
 
 
 
