@@ -1,4 +1,4 @@
-name: Maven CI
+name: build and deploy to ghcr
 
 on:
   push:
@@ -12,7 +12,6 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-
 
     steps:
       - name: Checkout Source
@@ -33,5 +32,32 @@ jobs:
           file: ./dockerfile.multi
           push: true
           tags: ghcr.io/annuppoudel505-cmyk/backend_repo:latest
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.2.0
+        with: 
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            echo "Logging into GHCR..."
+
+            echo "${{ secrets.CI_TOKEN }}" | docker login ghcr.io -u $GHCR_USERNAME --password-stdin
+            
+            echo "Pulling latest image..."
+            docker pull ghcr.io/annuppoudel505-cmyk/backend_repo:latest
+            
+            echo "Stopping old container..."
+            docker stop backend || true
+            docker rm backend || true
+
+            echo "Starting new container..."
+            docker run -d --name backend -p 80:3000 ghcr.io/annuppoudel505-cmyk/backend_repo:latest
+
 
 

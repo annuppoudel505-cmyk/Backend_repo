@@ -1,0 +1,7 @@
+services:
+  backend:
+    image: ghcr.io/annuppoudel505-cmyk/backend_repo:latest
+    container_name: backend 
+    restart: always 
+    ports:
+      - "8080:8080"
